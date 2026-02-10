@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Неоновый Кликер</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: #111;
+        font-family: Arial, sans-serif;
+        color: #0ff;
+    }
+
+    #scoreboard {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        font-size: 22px;
+        z-index: 1000;
+    }
+
+    #box {
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        background: linear-gradient(45deg,#00fff0,#ff00ff);
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 0 20px #0ff, 0 0 40px #f0f, 0 0 60px #0ff;
+    }
+
+    .explosion {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: radial-gradient(circle,#ff0,#f00);
+        opacity: 0.8;
+        animation: boom 0.4s forwards;
+        pointer-events: none;
+    }
+
+    @keyframes boom {
+        0% {transform: scale(0.5); opacity: 0.8;}
+        50% {transform: scale(1.5); opacity: 0.5;}
+        100% {transform: scale(2); opacity: 0;}
+    }
+
+    #end {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.95);
+        color: #0ff;
+        font-size: 32px;
+        text-align: center;
+        padding-top: 20%;
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 12px 25px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background: #0ff;
+        color: #111;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div id="scoreboard">Очки: <span id="score">0</span> | Время: <span id="time">30</span></div>
+<div id="box"></div>
+
+<div id="end">
+    Игра окончена!<br>
+    Очки: <span id="final"></span><br>
+    <button onclick="location.reload()">Играть снова</button>
+</div>
+
+<script>
+    const box = document.getElementById("box");
+    const scoreText = document.getElementById("score");
+    const timeText = document.getElementById("time");
+    const endScreen = document.getElementById("end");
+    const finalScore = document.getElementById("final");
+    let score = 0;
+    let time = 30;
+
+    function moveBox() {
+        const x = Math.random() * (window.innerWidth - 50);
+        const y = Math.random() * (window.innerHeight - 50);
+        box.style.left = x + "px";
+        box.style.top = y + "px";
+    }
+
+    function createExplosion(x, y) {
+        const exp = document.createElement("div");
+        exp.className = "explosion";
+        exp.style.left = (x-30) + "px";
+        exp.style.top = (y-30) + "px";
+        document.body.appendChild(exp);
+        setTimeout(()=>exp.remove(), 400);
+    }
+
+    box.onclick = (e) => {
+        score++;
+        scoreText.textContent = score;
+        createExplosion(e.clientX, e.clientY);
+        moveBox();
+    };
+
+    moveBox();
+
+    const timer = setInterval(() => {
+        time--;
+        timeText.textContent = time;
+        if (time <= 0) {
+            clearInterval(timer);
+            box.style.display = "none";
+            finalScore.textContent = score;
+            endScreen.style.display = "block";
+        }
+    }, 1000);
+</script>
+
+</body>
+</html>
